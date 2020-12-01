@@ -1,21 +1,15 @@
-# V2020
+# Advent of Code V2020
+Solutions in Elixir for the [2020 edition of the advent of code](https://adventofcode.com/2020)
 
-**TODO: Add description**
+## Run
+From your `iex` console (`iex -S mix`):
 
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `v2020` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:v2020, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/v2020](https://hexdocs.pm/v2020).
+- To get the solution for a specific day:
+  ```
+  V2020.solutions_for_day(day_number)
+  ```
+- To get all of the currently available solutions:
+  ```
+  V2020.all_solutions
+  ```
 

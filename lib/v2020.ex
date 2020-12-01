@@ -1,11 +1,14 @@
 defmodule V2020 do
-  alias Day1
-
-  def day1_solutions() do
-    IO.puts("***DAY 1***")
+  def solutions_for_day(day) do
+    IO.puts("***DAY #{day}***")
     IO.puts("-----part 1-----")
-    Day1.solution_part1()
+    apply(String.to_existing_atom("Elixir.V2020.Day#{day}"), :solution_part1, [])
     IO.puts("-----part 2-----")
-    Day1.solution_part2()
+    apply(String.to_existing_atom("Elixir.V2020.Day#{day}"), :solution_part2, [])
+  end
+
+  def all_solutions do
+    1..1
+    |> Enum.each(& solutions_for_day(&1))
   end
 end

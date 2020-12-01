@@ -1,4 +1,4 @@
-defmodule Day1 do
+defmodule V2020.Day1 do
   @input_file_part1 "lib/day1/input.txt"
   @input_file_part2 "lib/day1/input.txt"
   def solution_part1() do
