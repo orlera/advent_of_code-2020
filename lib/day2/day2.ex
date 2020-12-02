@@ -5,14 +5,21 @@ defmodule V2020.Day2 do
   def solution_part1() do
     @input_file_part1
     |> parse_input()
-    |> Enum.map(& validate_password(&1))
-    |> Enum.count(& &1[:valid?])
+    |> valide_passwords_number(&validate_password_min_max/1)
     |> IO.puts()
   end
 
   def solution_part2() do
     @input_file_part2
+    |> parse_input()
+    |> valide_passwords_number(&validate_password_index/1)
     |> IO.puts()
+  end
+
+  defp valide_passwords_number(passwords, validator) do
+    passwords
+    |> Enum.map(& validator.(&1))
+    |> Enum.count(& &1[:valid?])
   end
 
   defp parse_input(file_path) do
@@ -37,14 +44,14 @@ defmodule V2020.Day2 do
       |> Enum.at(2)
 
     %{
-      min: min_max |> Enum.at(0) |> String.to_integer(),
-      max: min_max |> Enum.at(1) |> String.to_integer(),
+      left: min_max |> Enum.at(0) |> String.to_integer(),
+      right: min_max |> Enum.at(1) |> String.to_integer(),
       char: char,
       password: password
     }
   end
 
-  defp validate_password(%{min: min, max: max, char: char, password: pass} = input) do
+  defp validate_password_min_max(%{left: min, right: max, char: char, password: pass} = input) do
     input
     |> Map.put(
       :valid?,
@@ -52,6 +59,17 @@ defmodule V2020.Day2 do
       |> String.graphemes
       |> Enum.count(& &1 == char)
       |> number_in_range(min, max)
+    )
+  end
+
+  defp validate_password_index(%{left: left, right: right, char: char, password: pass} = input) do
+    left_matches? = pass |> String.at(left - 1) == char
+    right_matches? = pass |> String.at(right - 1) == char
+
+    input
+    |> Map.put(
+      :valid?,
+      left_matches? && !right_matches? || !left_matches? && right_matches?
     )
   end
 
