@@ -29,15 +29,11 @@ defmodule V2020.Day3 do
 
   def calculate_trees_in_slope(slope, {right_steps, down_steps}) do
     slope
-    |> Enum.with_index()
-    |> Enum.reduce({0, 0}, fn {element, y_position}, {_tree_number, x_position} = acc ->
-      if rem(y_position, down_steps) == 0 do
-        element
-        |> String.at(x_position |> rem(@line_length))
-        |> maybe_add_tree(acc, right_steps)
-      else
-        acc
-      end
+    |> Enum.take_every(down_steps)
+    |> Enum.reduce({0, 0}, fn element, {_tree_number, x_position} = acc ->
+      element
+      |> String.at(x_position |> rem(@line_length))
+      |> maybe_add_tree(acc, right_steps)
     end)
   end
 
