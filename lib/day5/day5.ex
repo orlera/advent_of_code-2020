@@ -1,4 +1,5 @@
 defmodule V2020.Day5 do
+  @first_seat_id 21
   @input_file_part1 "lib/day5/input.txt"
   @input_file_part2 "lib/day5/input.txt"
 
@@ -13,7 +14,12 @@ defmodule V2020.Day5 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
-    # |> IO.inspect()
+    |> Enum.map(& calculate_seat(&1)[:id])
+    |> Enum.sort()
+    |> Enum.with_index(@first_seat_id)
+    |> Enum.filter(fn {id, index} -> id != index end)
+    |> List.first()
+    |> IO.inspect()
   end
 
   defp parse_input(file_path) do
