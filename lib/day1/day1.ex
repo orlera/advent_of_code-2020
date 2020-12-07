@@ -5,7 +5,7 @@ defmodule V2020.Day1 do
     @input_file_part1
     |> sorted_input()
     |> find_numbers_to_sum(2020)
-    |> IO.puts
+    |> IO.puts()
   end
 
   def solution_part2() do
@@ -34,6 +34,7 @@ defmodule V2020.Day1 do
   # It's past midnight, keeping it simple
   defp iterative(num_list) do
     list_size = Enum.count(num_list) - 1
+
     Enum.each(0..list_size, fn first_index ->
       Enum.each(1..list_size, fn second_index ->
         Enum.each(2..list_size, fn third_index ->
@@ -48,9 +49,9 @@ defmodule V2020.Day1 do
 
   defp sorted_input(input_file_path) do
     input_file_path
-      |> File.read!()
-      |> String.split("\n")
-      |> Enum.map(& String.to_integer(&1))
-      |> Enum.sort()
+    |> File.read!()
+    |> String.split("\n")
+    |> Enum.map(&String.to_integer(&1))
+    |> Enum.sort()
   end
 end

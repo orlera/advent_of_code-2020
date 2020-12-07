@@ -10,7 +10,7 @@ defmodule V2020 do
 
   def all_solutions do
     1..latest_solution()
-    |> Enum.map(& solutions_for_day(&1))
+    |> Enum.map(&solutions_for_day(&1))
   end
 
   def latest_solution() do
@@ -18,8 +18,8 @@ defmodule V2020 do
 
     solutions_folder
     |> File.ls!()
-    |> Enum.filter(&Path.join(solutions_folder, &1) |> File.dir?())
-    |> Enum.map(& String.trim_leading(&1, "day") |> String.to_integer)
+    |> Enum.filter(&(Path.join(solutions_folder, &1) |> File.dir?()))
+    |> Enum.map(&(String.trim_leading(&1, "day") |> String.to_integer()))
     |> Enum.max()
   end
 end

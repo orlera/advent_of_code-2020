@@ -6,7 +6,7 @@ defmodule V2020.Day5 do
   def solution_part1() do
     @input_file_part1
     |> parse_input()
-    |> Enum.map(& calculate_seat(&1))
+    |> Enum.map(&calculate_seat(&1))
     |> Enum.max_by(& &1[:id])
     |> IO.inspect()
   end
@@ -14,7 +14,7 @@ defmodule V2020.Day5 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
-    |> Enum.map(& calculate_seat(&1)[:id])
+    |> Enum.map(&calculate_seat(&1)[:id])
     |> Enum.sort()
     |> Enum.with_index(@first_seat_id)
     |> Enum.filter(fn {id, index} -> id != index end)
@@ -26,7 +26,7 @@ defmodule V2020.Day5 do
     file_path
     |> File.read!()
     |> String.split("\n")
-    |> Enum.map(& String.split_at(&1, 7))
+    |> Enum.map(&String.split_at(&1, 7))
   end
 
   defp calculate_seat({row_letter, column_letter}) do

@@ -6,7 +6,7 @@ defmodule V2020.Day6 do
   def solution_part1() do
     @input_file_part1
     |> parse_input()
-    |> Enum.map(& single_answers_count(&1))
+    |> Enum.map(&single_answers_count(&1))
     |> Enum.sum()
     |> IO.puts()
   end
@@ -14,7 +14,7 @@ defmodule V2020.Day6 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
-    |> Enum.map(& everybody_answered_count(&1))
+    |> Enum.map(&everybody_answered_count(&1))
     |> Enum.sum()
     |> IO.puts()
   end
@@ -37,9 +37,9 @@ defmodule V2020.Day6 do
   defp everybody_answered_count(group_answers) do
     group_answers
     |> String.split("\n")
-    |> Enum.map(& String.graphemes(&1))
+    |> Enum.map(&String.graphemes(&1))
     |> Enum.reduce(@all_questions, fn next_answers, current_answers ->
-      current_answers |> Enum.filter(& Enum.member?(next_answers, &1))
+      current_answers |> Enum.filter(&Enum.member?(next_answers, &1))
     end)
     |> Enum.count()
   end

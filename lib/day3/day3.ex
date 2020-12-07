@@ -12,11 +12,11 @@ defmodule V2020.Day3 do
 
   def solution_part2() do
     slope =
-    @input_file_part2
-    |> parse_input()
+      @input_file_part2
+      |> parse_input()
 
     [{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}]
-    |> Enum.map(& slope |> calculate_trees_in_slope(&1))
+    |> Enum.map(&(slope |> calculate_trees_in_slope(&1)))
     |> Enum.reduce(1, fn {trees, _}, acc -> trees * acc end)
     |> IO.puts()
   end
@@ -37,6 +37,8 @@ defmodule V2020.Day3 do
     end)
   end
 
-  defp maybe_add_tree("#", {trees, x_position}, right_steps), do: {trees + 1, x_position + right_steps}
+  defp maybe_add_tree("#", {trees, x_position}, right_steps),
+    do: {trees + 1, x_position + right_steps}
+
   defp maybe_add_tree(_, {trees, x_position}, right_steps), do: {trees, x_position + right_steps}
 end
