@@ -11,8 +11,17 @@ defmodule V2020.Day9 do
   end
 
   def solution_part2() do
+    input_list =
     @input_file_part2
     |> parse_input()
+
+    corrupt_number =
+      input_list
+      |> find_corrupt_number(0)
+
+    input_list
+    |> find_sum_window(corrupt_number)
+    |> sum_min_max()
     |> IO.inspect()
   end
 
@@ -58,4 +67,15 @@ defmodule V2020.Day9 do
   end
 
   defp find_numbers_to_sum([], sum_number), do: sum_number
+
+  defp find_sum_window(list, target, {low_index, high_index} \\ {0, 0}) do
+    window = list |> Enum.slice(low_index, high_index-low_index)
+    case window |> Enum.sum() do
+      ^target -> window
+      below_target when below_target < target -> find_sum_window(list, target, {low_index, high_index + 1})
+      _ -> find_sum_window(list, target, {low_index + 1, high_index})
+    end
+  end
+
+  defp sum_min_max(list), do: Enum.min(list) + Enum.max(list)
 end
