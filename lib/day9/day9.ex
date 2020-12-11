@@ -12,8 +12,8 @@ defmodule V2020.Day9 do
 
   def solution_part2() do
     input_list =
-    @input_file_part2
-    |> parse_input()
+      @input_file_part2
+      |> parse_input()
 
     corrupt_number =
       input_list
@@ -29,14 +29,14 @@ defmodule V2020.Day9 do
     file_path
     |> File.read!()
     |> String.split("\n")
-    |> Enum.map(& String.to_integer(&1))
+    |> Enum.map(&String.to_integer(&1))
   end
 
   defp find_corrupt_number(number_list, start_position) do
     number_list
     |> Enum.slice(start_position, @preamble_size + 1)
-    |> maybe_section_corrupted()
-    || find_corrupt_number(number_list, start_position + 1)
+    |> maybe_section_corrupted() ||
+      find_corrupt_number(number_list, start_position + 1)
   end
 
   defp maybe_section_corrupted(number_list) do
@@ -69,11 +69,17 @@ defmodule V2020.Day9 do
   defp find_numbers_to_sum([], sum_number), do: sum_number
 
   defp find_sum_window(list, target, {low_index, high_index} \\ {0, 0}) do
-    window = list |> Enum.slice(low_index, high_index-low_index)
+    window = list |> Enum.slice(low_index, high_index - low_index)
+
     case window |> Enum.sum() do
-      ^target -> window
-      below_target when below_target < target -> find_sum_window(list, target, {low_index, high_index + 1})
-      _ -> find_sum_window(list, target, {low_index + 1, high_index})
+      ^target ->
+        window
+
+      below_target when below_target < target ->
+        find_sum_window(list, target, {low_index, high_index + 1})
+
+      _ ->
+        find_sum_window(list, target, {low_index + 1, high_index})
     end
   end
 

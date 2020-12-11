@@ -29,7 +29,7 @@ defmodule V2020.Day10 do
     file_path
     |> File.read!()
     |> String.split("\n")
-    |> Enum.map(& String.to_integer(&1))
+    |> Enum.map(&String.to_integer(&1))
   end
 
   defp add_outlet(adapters), do: [0] ++ adapters
@@ -70,13 +70,12 @@ defmodule V2020.Day10 do
 
   defp to_combinations(occurrences) do
     occurrences
-    |> Enum.map(fn {_, quantity} -> fibonacci(quantity + 1) - 1
-    end)
+    |> Enum.map(fn {_, quantity} -> fibonacci(quantity + 1) - 1 end)
   end
 
   def fibonacci(0), do: 1
   def fibonacci(1), do: 1
   def fibonacci(num), do: fibonacci(num - 1) + fibonacci(num - 2)
 
-  defp multiply_values(factors), do: Enum.reduce(factors, 1, & &1 * &2)
+  defp multiply_values(factors), do: Enum.reduce(factors, 1, &(&1 * &2))
 end

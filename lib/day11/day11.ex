@@ -27,7 +27,7 @@ defmodule V2020.Day11 do
   end
 
   defp run_until_stable(seat_matrix, adjacent_seats_function, out_index \\ 0) do
-    new_seat_matrix = execute_round(seat_matrix, adjacent_seats_function) # |> write_output(out_index)
+    new_seat_matrix = execute_round(seat_matrix, adjacent_seats_function)
 
     case matrixes_equal?(seat_matrix, new_seat_matrix) do
       false -> run_until_stable(new_seat_matrix, adjacent_seats_function, out_index + 1)
@@ -38,19 +38,9 @@ defmodule V2020.Day11 do
   def execute_round(seat_matrix, adjacent_seats_function) do
     Enum.map(seat_matrix, fn {line, x_index} ->
       {Enum.map(line, fn {status, y_index} ->
-       maybe_update_seat(status, x_index, y_index, seat_matrix, adjacent_seats_function)
-      end), x_index}
+         maybe_update_seat(status, x_index, y_index, seat_matrix, adjacent_seats_function)
+       end), x_index}
     end)
-  end
-
-  def write_output(lines, index \\ 0) do
-    {:ok, file} = File.open("lib/day11/output#{index}.txt", [:write])
-    Enum.each(lines, fn {line, _} ->
-      Enum.each(line, fn {status, _} -> IO.binwrite(file, status) end)
-      IO.binwrite(file, "\n")
-    end)
-
-    lines
   end
 
   def count_occupied(seat_matrix) do
@@ -60,10 +50,11 @@ defmodule V2020.Day11 do
       end)
     end)
     |> List.flatten()
-    |> Enum.count(& &1 == "#")
+    |> Enum.count(&(&1 == "#"))
   end
 
-  defp maybe_update_seat(".", _, y_index, _, _, _), do: {".", y_index}
+  defp maybe_update_seat(".", _, y_index, _, _), do: {".", y_index}
+
   defp maybe_update_seat(seat_status, x_index, y_index, seat_matrix, adjacent_seats_function) do
     seat_matrix
     |> adjacent_seats_function.(x_index, y_index)
@@ -72,7 +63,9 @@ defmodule V2020.Day11 do
 
   defp adjacent_seats_p1(seat_matrix, x_index, y_index) do
     Enum.slice(seat_matrix, adjacent_range(x_index, Enum.count(seat_matrix) - 1))
-    |> Enum.map(fn {line, _} -> Enum.slice(line, adjacent_range(y_index, Enum.count(line) - 1)) end)
+    |> Enum.map(fn {line, _} ->
+      Enum.slice(line, adjacent_range(y_index, Enum.count(line) - 1))
+    end)
     |> List.flatten()
     |> Enum.map(fn {status, _} -> status end)
   end
@@ -96,8 +89,8 @@ defmodule V2020.Day11 do
   end
 
   defp adjacent_range(0, _), do: 0..1
-  defp adjacent_range(base, max) when base == max, do: base-1..base
-  defp adjacent_range(base, _), do: base-1..base+1
+  defp adjacent_range(base, max) when base == max, do: (base - 1)..base
+  defp adjacent_range(base, _), do: (base - 1)..(base + 1)
 
   def matrixes_equal?(matrix1, matrix2) do
     Enum.map(matrix1, fn {line1, x_index} ->
@@ -174,15 +167,25 @@ defmodule V2020.Day11 do
 
   defp seat_status_at_coordinate(seat_matrix, x_index, y_index) do
     line_count = Enum.count(seat_matrix)
+
     case x_index do
-      ^line_count -> "L"
-      -1 -> "L"
+      ^line_count ->
+        "L"
+
+      -1 ->
+        "L"
+
       _ ->
         {line, _} = Enum.at(seat_matrix, x_index)
         line_size = Enum.count(line)
+
         case y_index do
-          ^line_size -> "L"
-          -1 -> "L"
+          ^line_size ->
+            "L"
+
+          -1 ->
+            "L"
+
           _ ->
             {status, _} = Enum.at(line, y_index)
             status
