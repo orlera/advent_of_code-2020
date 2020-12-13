@@ -13,9 +13,8 @@ defmodule V2020.Day13 do
   def solution_part2() do
     @input_file_part2
     |> parse_input_p2()
-    |> align_schedule(100000000000000)
-    |> aligned_schedule_timestamp()
-    |> IO.inspect()
+    |> align_schedule()
+    |> IO.puts()
   end
 
   defp parse_input_p1(file_path) do
@@ -25,12 +24,15 @@ defmodule V2020.Day13 do
       |> String.split("\n")
 
     {Enum.at(rules, 0) |> String.to_integer(),
-    Enum.at(rules, 1) |> String.split(",") |> Enum.reject(& &1 == "x") |> Enum.map(& String.to_integer(&1))}
+     Enum.at(rules, 1)
+     |> String.split(",")
+     |> Enum.reject(&(&1 == "x"))
+     |> Enum.map(&String.to_integer(&1))}
   end
 
   defp next_bus({start_time, schedule}) do
     schedule
-    |> Enum.map(& {&1, rem(start_time, &1)})
+    |> Enum.map(&{&1, rem(start_time, &1)})
     |> Enum.max_by(fn {_, minutes} -> minutes end)
   end
 
@@ -47,22 +49,22 @@ defmodule V2020.Day13 do
     |> Enum.map(fn {bus_id, index} -> {bus_id |> String.to_integer(), index} end)
   end
 
-  defp align_schedule(schedule, next_step \\ 1) do
-    updated_schedule = Enum.map(schedule, fn {bus_id, offset} -> {bus_id, offset + next_step} end)
-
-    schedule_aligned?(updated_schedule) || align_schedule(updated_schedule)
+  defp align_schedule(schedule) do
+    {timestamp, _} = Enum.reduce(schedule, {0, 1}, &align_with_previous_busses/2)
+    timestamp
   end
 
-  defp schedule_aligned?(schedule) do
-    case Enum.all?(schedule, fn {bus_id, offset} -> rem(offset, bus_id) == 0 end) do
-      true -> schedule
+  defp align_with_previous_busses(bus, {timestamp, next_step} = current_alignment) do
+    bus_aligned?(bus, current_alignment) ||
+      align_with_previous_busses(bus, {timestamp + next_step, next_step})
+  end
+
+  defp bus_aligned?({bus_id, index}, {timestamp, next_step}) do
+    case rem(timestamp + index, bus_id) do
+      0 -> {timestamp, least_common_multiple(next_step, bus_id)}
       _ -> nil
     end
   end
 
-  defp aligned_schedule_timestamp(schedule) do
-    {_, timestamp} = List.first(schedule)
-
-    timestamp
-  end
+  defp least_common_multiple(a, b), do: div(a * b, Integer.gcd(a, b))
 end
