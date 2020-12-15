@@ -12,6 +12,7 @@ defmodule V2020.Day15 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
+    |> play_until(30000000)
     |> IO.inspect()
   end
 
