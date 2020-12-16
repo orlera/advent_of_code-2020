@@ -12,6 +12,10 @@ defmodule V2020.Day16 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
+    |> discard_invalid_tickets()
+    |> determine_fields_possible_positions()
+    |> remove_duplicate_positions()
+    |> my_ticket_stats()
     |> IO.inspect()
   end
 
@@ -38,7 +42,7 @@ defmodule V2020.Day16 do
   end
 
   defp to_range_tuple([field_name | [field_ranges]]) do
-    {field_name, field_ranges |> to_validation_function()}
+    {field_name, %{"validation" => field_ranges |> to_validation_function()}}
   end
 
   defp to_validation_function(ranges) do
@@ -65,7 +69,6 @@ defmodule V2020.Day16 do
   defp validate_scanned_tickets({validations, _, scanned_tickets}) do
     scanned_tickets
     |> Enum.map(&ticket_error_rate(&1, validations))
-    |> List.flatten()
     |> Enum.sum()
   end
 
@@ -77,11 +80,83 @@ defmodule V2020.Day16 do
         _ -> 0
       end
     )
+    |> Enum.sum()
   end
 
   defp field_valid?(field, validations) do
     validations
     |> Map.values()
-    |> Enum.any?(& &1.(field))
+    |> Enum.any?(& &1["validation"].(field))
+  end
+
+  defp discard_invalid_tickets({validations, my_ticket, scanned_tickets}) do
+    valid_tickets = Enum.reject(scanned_tickets, &ticket_error_rate(&1, validations) > 0)
+
+    {validations, my_ticket, valid_tickets}
+  end
+
+  defp determine_fields_possible_positions({fields_data, my_ticket, scanned_tickets}) do
+    updated_fields_data =
+      fields_data
+      |> Enum.map(fn {field_name, %{"validation" => validation} = field_data} ->
+        possible_positions =
+          my_ticket
+          |> Enum.with_index()
+          |> Enum.reduce([], fn {_, index}, acc ->
+            acc ++ [{Enum.all?(scanned_tickets, & validation.(Enum.at(&1, index))), index}]
+          end)
+          |> IO.inspect(label: field_name)
+          |> Enum.filter(fn {possible, _} -> possible end)
+          |> Enum.map(& elem(&1, 1))
+
+        {field_name, Map.put(field_data, "possible_positions", possible_positions)}
+      end)
+      |> Enum.sort_by(fn {_, %{"possible_positions" => possible_positions}} -> Enum.count(possible_positions) end)
+
+    {updated_fields_data, my_ticket, scanned_tickets}
+  end
+
+  defp remove_duplicate_positions({fields_data, my_ticket, scanned_tickets}) do
+    updated_fields_data =
+    fields_data
+    |> Enum.with_index()
+    |> Enum.reduce(fields_data, fn {_, index}, acc ->
+      possible_positions = Enum.at(acc, index) |> elem(1) |> Map.get("possible_positions")
+      case Enum.count(possible_positions) do
+        1 -> remove_position_from_rest(Enum.at(possible_positions, 0), acc, index + 1)
+        _ -> acc
+      end
+    end)
+
+    {updated_fields_data, my_ticket, scanned_tickets}
+  end
+
+  defp remove_position_from_rest(position, fields_data, from) do
+    fields_data
+    |> Enum.with_index()
+    |> Enum.map(fn {{field_name, %{"possible_positions" => possible_positions} = field_data}, index} ->
+      cond do
+        index >= from -> {field_name, %{field_data | "possible_positions" => Enum.reject(possible_positions, & &1 == position)}}
+        true -> {field_name, field_data}
+      end
+    end)
+  end
+
+  defp my_ticket_stats({fields_data, my_ticket, _}) do
+    positions =
+    fields_data
+    |> Enum.filter(fn {name, _} -> String.starts_with?(name, "departure") end)
+    |> Enum.map(fn {_, %{"possible_positions" => positions}} -> positions end)
+    |> List.flatten()
+
+
+    my_ticket
+    |> Enum.with_index()
+    |> Enum.reduce(1, fn {value, index}, acc ->
+      cond do
+        Enum.member?(positions, index) -> acc * value
+        true -> acc
+      end
+    end)
   end
 end
