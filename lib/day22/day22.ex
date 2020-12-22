@@ -5,7 +5,7 @@ defmodule V2020.Day22 do
   def solution_part1() do
     @input_file_part1
     |> parse_input()
-    |> play_round()
+    |> combat()
     |> calculate_score(0)
     |> IO.inspect()
   end
@@ -13,6 +13,9 @@ defmodule V2020.Day22 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
+    |> recursive_combat()
+    |> elem(1)
+    |> calculate_score(0)
     |> IO.inspect()
   end
 
@@ -25,22 +28,32 @@ defmodule V2020.Day22 do
     |> List.to_tuple()
   end
 
-  defp play_round({first, []}), do: first
-  defp play_round({[], second}), do: second
+  defp combat({first, []}), do: first
+  defp combat({[], second}), do: second
+  defp combat({[top_first | rest_first], [top_second | rest_second]}) when top_first > top_second, do: combat({rest_first ++ [top_first, top_second], rest_second})
+  defp combat({[top_first | rest_first], [top_second | rest_second]}) when top_first < top_second, do: combat({rest_first, rest_second ++ [top_second, top_first]})
 
-  defp play_round({first, second}) do
-    {card_first, rest_first} = List.pop_at(first, 0)
-    {card_second, rest_second} = List.pop_at(second, 0)
+  defp recursive_combat({first, second}), do: play_round({first, second}, MapSet.new())
 
-    case card_first > card_second do
-      true -> {rest_first ++ [card_first, card_second], rest_second}
-      _ -> {rest_first, rest_second ++ [card_second, card_first]}
+  defp play_round({first, second}, previous_rounds) do
+    cond do
+      MapSet.member?(previous_rounds, {first, second}) -> {:first, first}
+      Enum.empty?(second) -> {:first, first}
+      Enum.empty?(first) -> {:second, second}
+      hd(first) <= length(tl(first)) and hd(second) <= length(tl(second)) ->
+        case recursive_combat({Enum.take(tl(first), hd(first)), Enum.take(tl(second), hd(second))}) do
+          {:first, _} -> play_round({tl(first) ++ [hd(first), hd(second)], tl(second)}, MapSet.put(previous_rounds, {first, second}))
+          {:second, _} -> play_round({tl(first), tl(second) ++ [hd(second), hd(first)]}, MapSet.put(previous_rounds, {first, second}))
+        end
+      hd(first) > hd(second) -> play_round({tl(first) ++ [hd(first), hd(second)], tl(second)}, MapSet.put(previous_rounds, {first, second}))
+      hd(first) < hd(second) -> play_round({tl(first), tl(second) ++ [hd(second), hd(first)]}, MapSet.put(previous_rounds, {first, second}))
     end
-    |> play_round()
   end
 
   defp calculate_score([top_card], accumulator), do: accumulator + top_card
 
   defp calculate_score([top_card | rest] = deck, accumulator),
-    do: calculate_score(rest, accumulator + top_card * Enum.count(deck))
+    do: calculate_score(rest, accumulator + top_card * length(deck))
+  defp calculate_score({_, [top_card | rest] = deck}, accumulator),
+    do: calculate_score(rest, accumulator + top_card * length(deck))
 end
