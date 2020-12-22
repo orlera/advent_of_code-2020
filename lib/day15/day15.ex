@@ -12,7 +12,7 @@ defmodule V2020.Day15 do
   def solution_part2() do
     @input_file_part2
     |> parse_input()
-    |> play_until(30000000)
+    |> play_until(30_000_000)
     |> IO.inspect()
   end
 
@@ -21,7 +21,7 @@ defmodule V2020.Day15 do
       file_path
       |> File.read!()
       |> String.split(",")
-      |> Enum.map(& String.to_integer(&1))
+      |> Enum.map(&String.to_integer(&1))
       |> Enum.split(-1)
 
     {turns

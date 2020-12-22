@@ -11,12 +11,12 @@ defmodule V2020.Day21 do
       alergens
       |> ingredients_containing_alergens(alergen_ingredients)
       |> Map.values()
-      |> Enum.reduce(MapSet.new, & MapSet.union(&1, &2))
+      |> Enum.reduce(MapSet.new(), &MapSet.union(&1, &2))
 
     products
-    |> Enum.map(& elem(&1, 0))
+    |> Enum.map(&elem(&1, 0))
     |> List.flatten()
-    |> Enum.reject(& MapSet.member?(ingredients_with_alergens, &1))
+    |> Enum.reject(&MapSet.member?(ingredients_with_alergens, &1))
     |> Enum.count()
   end
 
@@ -32,20 +32,19 @@ defmodule V2020.Day21 do
     |> Enum.sort_by(fn {alergen, _} -> alergen end)
     |> Enum.reduce([], fn {_, ingredient}, acc -> acc ++ MapSet.to_list(ingredient) end)
     |> Enum.join(",")
-
   end
 
   defp parse_input(file_path) do
     file_path
     |> File.read!()
     |> String.split("\n")
-    |> Enum.map(& Regex.run(~r/(.+) \(contains (.+)\)/, &1))
-    |> Enum.map(& {String.split(Enum.at(&1, 1)), String.split(Enum.at(&1, 2), ", ")})
+    |> Enum.map(&Regex.run(~r/(.+) \(contains (.+)\)/, &1))
+    |> Enum.map(&{String.split(Enum.at(&1, 1)), String.split(Enum.at(&1, 2), ", ")})
   end
 
   defp alergen_list(products) do
     products
-    |> Enum.map(& elem(&1, 1))
+    |> Enum.map(&elem(&1, 1))
     |> List.flatten()
     |> MapSet.new()
   end
@@ -53,7 +52,7 @@ defmodule V2020.Day21 do
   defp possible_ingredients_by_alergen(products) do
     products
     |> Enum.reduce([], fn {ingredients, alergens}, acc ->
-      acc ++ Enum.map(alergens, & {&1, ingredients})
+      acc ++ Enum.map(alergens, &{&1, ingredients})
     end)
   end
 
@@ -66,7 +65,9 @@ defmodule V2020.Day21 do
 
       possible_ingredients =
         compatible_ingredients
-        |> Enum.reduce(MapSet.new(compatible_ingredients |> List.first() |> elem(1)), fn {_, ingredients}, acc ->
+        |> Enum.reduce(MapSet.new(compatible_ingredients |> List.first() |> elem(1)), fn {_,
+                                                                                          ingredients},
+                                                                                         acc ->
           ingredients
           |> MapSet.new()
           |> MapSet.intersection(acc)
@@ -86,16 +87,17 @@ defmodule V2020.Day21 do
       |> Enum.with_index()
       |> Enum.reduce(sorted_alergens, fn {_, index}, acc ->
         possible_ingredients = acc |> Enum.at(index) |> elem(1)
+
         case MapSet.size(possible_ingredients) do
           1 -> remove_ingredient_from_rest(Enum.at(possible_ingredients, 0), acc, index + 1)
           _ -> acc
         end
       end)
 
-      case Enum.all?(updated_alergens, fn {_, ingredients} -> MapSet.size(ingredients) < 2 end) do
-        false -> remove_duplicate_ingredients(updated_alergens)
-        _ -> updated_alergens
-      end
+    case Enum.all?(updated_alergens, fn {_, ingredients} -> MapSet.size(ingredients) < 2 end) do
+      false -> remove_duplicate_ingredients(updated_alergens)
+      _ -> updated_alergens
+    end
   end
 
   defp remove_ingredient_from_rest(ingredient, alergen_ingredients, from) do
